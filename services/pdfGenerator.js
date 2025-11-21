@@ -65,8 +65,17 @@ export async function generatePDF(resumeData, theme = undefined) {
     const cmd = `${resumeCli} export "${pdfFile}"${themeArg} --resume "${resumeFile}"`;
 
     // Execute resume-cli to export PDF
+    const baseEnv = {
+      ...process.env,
+      NO_COLOR: '1',
+      // Force puppeteer to use system Chromium in container
+      PUPPETEER_EXECUTABLE_PATH: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true',
+      // Some environments respect CHROMIUM_FLAGS; include common flags
+      CHROMIUM_FLAGS: process.env.CHROMIUM_FLAGS || '--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage',
+    };
     try {
-      const { stdout, stderr } = await execAsync(cmd, { env: { ...process.env, NO_COLOR: '1' } });
+      const { stdout, stderr } = await execAsync(cmd, { env: baseEnv });
       if (stdout) console.error('[resume-cli stdout]', stdout);
       if (stderr) console.error('[resume-cli stderr]', stderr);
     } catch (err) {
@@ -86,7 +95,7 @@ export async function generatePDF(resumeData, theme = undefined) {
       try {
         const fallbackCmd = `${resumeCli} export "${pdfFile}" --resume "${resumeFile}"`;
         try {
-          const { stdout, stderr } = await execAsync(fallbackCmd, { env: { ...process.env, NO_COLOR: '1' } });
+          const { stdout, stderr } = await execAsync(fallbackCmd, { env: baseEnv });
           if (stdout) console.error('[resume-cli fallback stdout]', stdout);
           if (stderr) console.error('[resume-cli fallback stderr]', stderr);
         } catch (err2) {
