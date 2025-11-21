@@ -65,7 +65,16 @@ export async function generatePDF(resumeData, theme = undefined) {
     const cmd = `${resumeCli} export "${pdfFile}"${themeArg} --resume "${resumeFile}"`;
 
     // Execute resume-cli to export PDF
-    await execAsync(cmd, { env: { ...process.env, NO_COLOR: '1' } });
+    try {
+      const { stdout, stderr } = await execAsync(cmd, { env: { ...process.env, NO_COLOR: '1' } });
+      if (stdout) console.error('[resume-cli stdout]', stdout);
+      if (stderr) console.error('[resume-cli stderr]', stderr);
+    } catch (err) {
+      const e = err;
+      if (e?.stdout) console.error('[resume-cli stdout]', e.stdout);
+      if (e?.stderr) console.error('[resume-cli stderr]', e.stderr);
+      throw err;
+    }
 
     // Read generated PDF
     const pdfBuffer = await readFile(pdfFile);
@@ -76,7 +85,16 @@ export async function generatePDF(resumeData, theme = undefined) {
     if (theme) {
       try {
         const fallbackCmd = `${resumeCli} export "${pdfFile}" --resume "${resumeFile}"`;
-        await execAsync(fallbackCmd, { env: { ...process.env, NO_COLOR: '1' } });
+        try {
+          const { stdout, stderr } = await execAsync(fallbackCmd, { env: { ...process.env, NO_COLOR: '1' } });
+          if (stdout) console.error('[resume-cli fallback stdout]', stdout);
+          if (stderr) console.error('[resume-cli fallback stderr]', stderr);
+        } catch (err2) {
+          const e2 = err2;
+          if (e2?.stdout) console.error('[resume-cli fallback stdout]', e2.stdout);
+          if (e2?.stderr) console.error('[resume-cli fallback stderr]', e2.stderr);
+          throw error;
+        }
         const pdfBuffer = await readFile(pdfFile);
         return pdfBuffer;
       } catch (e) {
