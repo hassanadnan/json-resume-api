@@ -16,6 +16,7 @@
     "jsonresume-theme-kendall": "^0.2.0",
     "jsonresume-theme-paper-plus-plus": "^0.6.0",
     "jsonschema": "^1.4.1",
+    "puppeteer-core": "^22.7.1",
     "resume-cli": "^3.0.0",
     "resume-schema": "^1.0.0"
   },
