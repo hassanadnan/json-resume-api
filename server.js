@@ -46,9 +46,14 @@ app.post('/api/resume/generate', async (req, res) => {
     res.send(pdfBuffer);
   } catch (error) {
     console.error('Error generating resume:', error);
+    // Bubble up stderr/stdout if present (from child_process.exec errors)
+    const stderr = error?.stderr ? String(error.stderr).slice(0, 4000) : undefined;
+    const stdout = error?.stdout ? String(error.stdout).slice(0, 2000) : undefined;
     res.status(500).json({
       error: 'Failed to generate resume',
-      message: error.message,
+      message: error?.message || 'Unknown error',
+      stderr,
+      stdout,
     });
   }
 });
