@@ -5,8 +5,35 @@ import { writeFile, readFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { existsSync } from 'fs';
+import { createRequire } from 'module';
 
 const execAsync = promisify(exec);
+const require = createRequire(import.meta.url);
+
+function resolveThemePath(theme) {
+  if (!theme || typeof theme !== 'string') return null;
+  const normalized = theme.toLowerCase();
+  const map = {
+    kendall: 'jsonresume-theme-kendall',
+    elegant: 'jsonresume-theme-elegant',
+    flat: 'jsonresume-theme-flat',
+    'paper-plus-plus': 'jsonresume-theme-paper-plus-plus',
+  };
+  const pkg = map[normalized];
+  if (!pkg) return null;
+  // Try resolve package entrypoint
+  try {
+    return require.resolve(pkg);
+  } catch {}
+  // Try index.js within package
+  try {
+    return require.resolve(`${pkg}/index.js`);
+  } catch {}
+  // Fallback to node_modules absolute guess
+  const guessed = join(process.cwd(), 'node_modules', pkg, 'index.js');
+  if (existsSync(guessed)) return guessed;
+  return null;
+}
 
 function getResumeCliCommand() {
   // Prefer local binary if available, else fallback to npx
@@ -32,8 +59,9 @@ export async function generatePDF(resumeData, theme = undefined) {
     // Write resume JSON to a temporary file
     await writeFile(resumeFile, JSON.stringify(resumeData, null, 2), 'utf8');
 
-    // Build command
-    const themeArg = theme ? ` --theme ${theme}` : '';
+    // Build command - try absolute theme path if available
+    const themePath = theme ? resolveThemePath(theme) : null;
+    const themeArg = themePath ? ` --theme "${themePath}"` : (theme ? ` --theme ${theme}` : '');
     const cmd = `${resumeCli} export "${pdfFile}"${themeArg} --resume "${resumeFile}"`;
 
     // Execute resume-cli to export PDF
