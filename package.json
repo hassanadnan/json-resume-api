@@ -1,0 +1,27 @@
+{
+  "name": "json-resume-api",
+  "version": "1.0.0",
+  "description": "API service for generating resumes from JSON Resume format",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonresume-theme-elegant": "^1.16.1",
+    "jsonresume-theme-even": "^0.26.1",
+    "jsonresume-theme-flat": "^0.3.7",
+    "jsonresume-theme-kendall": "^0.2.0",
+    "jsonresume-theme-paper-plus-plus": "^0.6.0",
+    "jsonresume-theme-professional": "^1.1.0",
+    "jsonschema": "^1.4.1",
+    "resume-cli": "^3.0.0",
+    "resume-schema": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

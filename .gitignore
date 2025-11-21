@@ -1,0 +1,29 @@
+# Node
+node_modules/
+npm-debug.log*
+pnpm-lock.yaml
+yarn.lock
+.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env
+.env
+.env.*
+
+# Runtime
+tmp/
+temp/
+*.tmp
+
+# Editors
+.idea/
+.vscode/
+
+
